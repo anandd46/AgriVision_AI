@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # AgriVision AI: AI Agriculture Disease Detection & Guide
 
 AgriVision AI is a modern, responsive, and farmer-focused web and API application built using **Python, Flask, and OpenCV**. It diagnoses critical diseases in **Coconut and Arecanut leaves** using real-time computer vision segmentation, provides organic and chemical treatment guides, calculates precise NPK fertilizer ratios, and offers ready-to-use API endpoints for mobile apps (Flutter / React Native).
@@ -178,3 +179,6 @@ class DiseaseDetector:
   ```
 
 *See the **Mobile API Docs** page in the web app for complete, copy-pasteable **Flutter (Dart)** and **React Native (JS)** camera upload functions.*
+=======
+# AgriVision_AI
+>>>>>>> 5f64282f3793e0e2d0c2153b2da5e3678bd158db
