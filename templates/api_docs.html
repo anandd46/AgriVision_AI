@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}API Documentation - AgriVision AI{% endblock %}
+
+{% block header_title %}Mobile App Integration Guide{% endblock %}
+
+{% block content %}
+<div style="display: flex; flex-direction: column; gap: 2rem;">
+    <!-- Intro Section -->
+    <section class="glass-panel" style="padding: 2rem;">
+        <h2 style="font-size: 1.3rem; margin-bottom: 0.5rem; letter-spacing: -0.3px;">Mobile REST Integration</h2>
+        <p style="font-size: 0.9rem; opacity: 0.8; line-height: 1.6;">
+            AgriVision AI has been engineered with a mobile-first philosophy. All diagnostic logic, computer vision matrices, and fertilizer recommendation charts are accessible via lightweight JSON REST APIs. This allows Flutter, React Native, or Native Android developers to construct highly responsive field apps for farmers.
+        </p>
+    </section>
+
+    <!-- Endpoint 1: Scan API -->
+    <section class="glass-panel" style="padding: 2rem;">
+        <h2 style="font-size: 1.2rem; margin-bottom: 1rem;">1. Image Diagnostic Endpoint</h2>
+        
+        <div class="api-block">
+            <div class="api-method-path">
+                <span class="method-tag method-post">POST</span>
+                <span>/api/scan</span>
+            </div>
+            <div class="api-details">
+                <p style="font-size: 0.85rem; opacity: 0.8; margin-bottom: 0.75rem;">
+                    Upload leaf image for disease diagnosis and color ratio metric evaluation.
+                </p>
+                
+                <h4 style="font-size: 0.85rem; margin-bottom: 0.5rem;">Request Type: <code>multipart/form-data</code></h4>
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left; margin-bottom: 1rem;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <th style="padding: 0.5rem;">Key</th>
+                            <th style="padding: 0.5rem;">Type</th>
+                            <th style="padding: 0.5rem;">Required</th>
+                            <th style="padding: 0.5rem;">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td style="padding: 0.5rem;"><strong>image</strong></td>
+                            <td style="padding: 0.5rem;">File (binary)</td>
+                            <td style="padding: 0.5rem; color: var(--accent-danger);">Yes</td>
+                            <td style="padding: 0.5rem; opacity: 0.8;">Leaf photo (JPG, PNG)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.5rem;"><strong>crop</strong></td>
+                            <td style="padding: 0.5rem;">String</td>
+                            <td style="padding: 0.5rem;">No</td>
+                            <td style="padding: 0.5rem; opacity: 0.8;"><code>coconut</code> or <code>arecanut</code> (default: <code>coconut</code>)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4 style="font-size: 0.85rem; margin-bottom: 0.25rem;">Response Example (JSON):</h4>
+                <pre>{
+  "crop": "Coconut",
+  "disease_code": "Leaf Rot",
+  "disease_name": "Coconut Leaf Rot (Colletotrichum gloeosporioides)",
+  "confidence": 92.5,
+  "severity": "medium",
+  "symptoms": [
+    "Large decayed dry patches (12.4%) detected on the leaf blade.",
+    "Blackening and shriveling of the leaf tips"
+  ],
+  "organic_treatment": "Apply Neem cake (2kg/tree) at the base...",
+  "chemical_treatment": "Remove the rotten spindle parts and spray...",
+  "fertilizer_recommendation": "Increase Potassium (K) dose by 20%...",
+  "metrics": {
+    "green_percentage": 76.2,
+    "yellow_percentage": 11.4,
+    "brown_percentage": 12.4
+  },
+  "annotated_image": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEA..."
+}</pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code Integration Snippets -->
+    <section class="glass-panel" style="padding: 2rem;">
+        <h2 style="font-size: 1.2rem; margin-bottom: 1rem;">Mobile Code SDK Snippets</h2>
+        
+        <!-- Tab menu simulated with CSS toggles or small JS script -->
+        <div style="display: flex; gap: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1rem;">
+            <button class="filter-chip active" id="btn-flutter" onclick="toggleSnippet('flutter')">Flutter (Dart)</button>
+            <button class="filter-chip" id="btn-react" onclick="toggleSnippet('react')">React Native (JS)</button>
+        </div>
+
+        <!-- Flutter Dart Snippet -->
+        <div id="snip-flutter" style="display: block;">
+            <p style="font-size: 0.85rem; opacity: 0.8; margin-bottom: 0.5rem;">
+                Use the <code>http</code> package to send leaf photos to the Flask backend from your Flutter app:
+            </p>
+            <pre>import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+Future&lt;Map&lt;String, dynamic&gt;&gt; diagnoseLeaf(File imageFile, String crop) async {
+  var request = http.MultipartRequest(
+    'POST', 
+    Uri.parse('http://YOUR_SERVER_IP:5000/api/scan')
+  );
+  
+  // Attach variables
+  request.fields['crop'] = crop;
+  request.files.add(
+    await http.MultipartFile.fromPath('image', imageFile.path)
+  );
+
+  var response = await request.send();
+  if (response.statusCode == 200) {
+    var responseData = await response.stream.bytesToString();
+    return jsonDecode(responseData);
+  } else {
+    throw Exception('Failed to diagnose leaf.');
+  }
+}</pre>
+        </div>
+
+        <!-- React Native Snippet -->
+        <div id="snip-react" style="display: none;">
+            <p style="font-size: 0.85rem; opacity: 0.8; margin-bottom: 0.5rem;">
+                Use the <code>fetch</code> API to upload files using <code>FormData</code> in React Native:
+            </p>
+            <pre>const diagnoseLeafImage = async (imageUri, cropType = 'coconut') => {
+  const formData = new FormData();
+  formData.append('crop', cropType);
+  formData.append('image', {
+    uri: imageUri,
+    name: 'leaf_photo.jpg',
+    type: 'image/jpeg',
+  });
+
+  try {
+    const response = await fetch('http://YOUR_SERVER_IP:5000/api/scan', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("API Diagnostic Error: ", error);
+  }
+};</pre>
+        </div>
+    </section>
+</div>
+
+<script>
+    function toggleSnippet(platform) {
+        const flutterBtn = document.getElementById('btn-flutter');
+        const reactBtn = document.getElementById('btn-react');
+        const flutterSnip = document.getElementById('snip-flutter');
+        const reactSnip = document.getElementById('snip-react');
+
+        if (platform === 'flutter') {
+            flutterBtn.classList.add('active');
+            reactBtn.classList.remove('active');
+            flutterSnip.style.display = 'block';
+            reactSnip.style.display = 'none';
+        } else {
+            reactBtn.classList.add('active');
+            flutterBtn.classList.remove('active');
+            reactSnip.style.display = 'block';
+            flutterSnip.style.display = 'none';
+        }
+    }
+</script>
+{% endblock %}

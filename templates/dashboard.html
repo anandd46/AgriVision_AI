@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - AgriVision AI{% endblock %}
+
+{% block header_title %}Farm Security Center{% endblock %}
+
+{% block content %}
+<div style="display: flex; flex-direction: column; gap: 2rem;">
+    <!-- Live Agricultural Status & Weather -->
+    <section class="dashboard-grid">
+        <!-- Weather Card -->
+        <div class="stats-card glass-panel" style="display: flex; flex-direction: column;">
+            <span class="stats-title trn" data-key="stat_weather_title">Live Weather & Condition</span>
+            <div class="weather-widget">
+                <svg class="weather-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" stroke-linecap="round"></path>
+                    <path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25" fill="none" stroke-linecap="round"></path>
+                </svg>
+                <div>
+                    <div id="val-temperature" style="font-size: 1.8rem; font-weight: 800;">{{ stats.temperature }}</div>
+                    <div id="val-condition" style="font-size: 0.9rem; opacity: 0.8;">{{ stats.weather_condition }}</div>
+                </div>
+            </div>
+            
+            <!-- Weather Search Form -->
+            <form id="weather-search-form" style="display: flex; gap: 0.4rem; margin-top: 0.5rem; margin-bottom: 0.5rem; width: 100%;">
+                <input type="text" id="weather-search-input" class="form-control trn" data-key="weather_placeholder" placeholder="Search city (e.g. Mysuru)..." required style="flex: 1; padding: 0.35rem 0.75rem; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0, 0, 0, 0.05); color: inherit; height: 32px;">
+                <button type="submit" class="btn trn" data-key="weather_go" style="padding: 0 0.75rem; font-size: 0.8rem; border-radius: 6px; background: var(--primary-color); color: #fff; border: none; cursor: pointer; height: 32px; display: flex; align-items: center; justify-content: center;">Go</button>
+            </form>
+
+            <div style="font-size: 0.85rem; opacity: 0.7; border-top: 1px solid var(--border-color); padding-top: 0.75rem; margin-top: auto;">
+                <span class="trn" data-key="stat_location">Location</span>: <strong id="val-location">{{ stats.location }}</strong>
+            </div>
+        </div>
+
+        <!-- Soil Moisture / Health -->
+        <div class="stats-card glass-panel">
+            <span class="stats-title trn" data-key="stat_moisture_title">Soil Moisture Status</span>
+            <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-top: 0.5rem;">
+                <span id="val-soil-moisture" class="stats-value">{{ stats.soil_moisture }}</span>
+            </div>
+            <p style="font-size: 0.85rem; opacity: 0.8; margin-top: 0.5rem;" class="trn" data-key="moisture_desc">Optimal range for root nutrient uptake in light laterite soils.</p>
+            <div style="font-size: 0.85rem; opacity: 0.7; border-top: 1px solid var(--border-color); padding-top: 0.75rem; margin-top: auto;">
+                <span class="trn" data-key="stat_humidity">Humidity level</span>: <strong id="val-humidity">{{ stats.humidity }}</strong>
+            </div>
+        </div>
+
+        <!-- System Alerts / Activity -->
+        <div class="stats-card alert-card glass-panel">
+            <span class="stats-title trn" data-key="stat_alerts_title">Active Leaf Infections</span>
+            <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-top: 0.5rem;">
+                <span class="stats-value" style="color: var(--accent-danger);">{{ stats.active_alerts }} <span class="trn" data-key="active_threats">Threats</span></span>
+            </div>
+            <p style="font-size: 0.85rem; opacity: 0.8; margin-top: 0.5rem;" class="trn" data-key="threat_warning">Infected trees logged in database requiring active chemical spray treatment.</p>
+            <div style="font-size: 0.85rem; opacity: 0.7; border-top: 1px solid var(--border-color); padding-top: 0.75rem; margin-top: auto; color: var(--accent-danger); font-weight: 600;" class="trn" data-key="stat_alert_footer">
+                Attention required in scan history logs.
+            </div>
+        </div>
+    </section>
+
+    <!-- Fungal Risk Weather Integration -->
+    <section class="glass-panel" style="padding: 1.5rem; border-left: 5px solid var(--accent-warning); background: rgba(255, 176, 0, 0.03);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <h3 style="font-size: 1.1rem; color: #a17000; margin-bottom: 0.25rem;" class="trn" data-key="fungal_title">Fungal Spore Outbreak Risk: HIGH (78%)</h3>
+                <p style="font-size: 0.85rem; opacity: 0.85;" class="trn" data-key="fungal_desc">High ambient humidity (82%) coupled with warm temperatures creates optimal germination conditions for <em>Phytophthora palmivora</em> spores (Bud Rot / Koleroga).</p>
+            </div>
+            <span class="severity-badge badge-medium" style="font-size: 0.85rem; padding: 0.4rem 1.2rem;" class="trn" data-key="badge_warning">Warning</span>
+        </div>
+    </section>
+
+    <!-- Quick Navigation Actions -->
+    <section style="display: flex; flex-direction: column; gap: 1rem;">
+        <h2 style="font-size: 1.3rem; letter-spacing: -0.3px;" class="trn" data-key="toolset_title">Farmer Toolset</h2>
+        
+        <div class="quick-actions">
+            <!-- Scan Action -->
+            <a href="{{ url_for('scan_page') }}" class="action-btn glass-panel">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"></path>
+                    <path d="M12 12c-2.5 0-4-1.5-4-1.5S9.5 9 12 9s4 1.5 4 1.5S14.5 12 12 12z"></path>
+                    <path d="M12 12v6"></path>
+                </svg>
+                <div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 0.25rem;" class="trn" data-key="tool_scanner">Scan Crop Leaf</h3>
+                    <p style="font-size: 0.85rem; opacity: 0.7;" class="trn" data-key="tool_scanner_desc">Upload leaf photo to diagnose diseases instantly.</p>
+                </div>
+            </a>
+
+            <!-- Fertilizer Calculator -->
+            <a href="{{ url_for('fertilizer_page') }}" class="action-btn glass-panel">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="1" x2="12" y2="23"></line>
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+                <div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 0.25rem;" class="trn" data-key="tool_fert">Fertilizer Guide</h3>
+                    <p style="font-size: 0.85rem; opacity: 0.7;" class="trn" data-key="tool_fert_desc">Calculate exact NPK ratios and organic compost.</p>
+                </div>
+            </a>
+
+            <!-- Disease Library -->
+            <a href="{{ url_for('library_page') }}" class="action-btn glass-panel">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg>
+                <div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 0.25rem;" class="trn" data-key="tool_lib">Disease Database</h3>
+                    <p style="font-size: 0.85rem; opacity: 0.7;" class="trn" data-key="tool_lib_desc">Browse list of treatments, causes, and symptoms.</p>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- Interactive Persistence Scan History Tracker -->
+    <section class="glass-panel" style="padding: 1.5rem;">
+        <h2 style="font-size: 1.3rem; margin-bottom: 1rem; letter-spacing: -0.3px;" class="trn" data-key="history_title">Leaf Diagnosis Registry</h2>
+        
+        {% if history %}
+        <div style="overflow-x: auto; width: 100%;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--border-color); opacity: 0.8; font-weight: 700;">
+                        <th style="padding: 0.75rem;" class="trn" data-key="th_date">Date</th>
+                        <th style="padding: 0.75rem;" class="trn" data-key="th_crop">Crop</th>
+                        <th style="padding: 0.75rem;" class="trn" data-key="th_diagnosis">Diagnosis</th>
+                        <th style="padding: 0.75rem;" class="trn" data-key="th_conf">Confidence</th>
+                        <th style="padding: 0.75rem;" class="trn" data-key="th_status">Treatment Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in history %}
+                    <tr style="border-bottom: 1px solid var(--border-color);" class="history-row" data-id="{{ item.id }}">
+                        <td style="padding: 0.75rem; white-space: nowrap; font-size: 0.8rem; opacity: 0.8;">{{ item.timestamp }}</td>
+                        <td style="padding: 0.75rem; text-transform: capitalize; font-weight: 600;">{{ item.crop }}</td>
+                        <td style="padding: 0.75rem;">
+                            <span class="severity-badge badge-{{ item.severity }}" style="font-size: 0.75rem; padding: 0.2rem 0.6rem;">
+                                {{ item.disease_name }}
+                            </span>
+                        </td>
+                        <td style="padding: 0.75rem; font-weight: 700;">{{ item.confidence }}%</td>
+                        <td style="padding: 0.75rem;">
+                            <!-- Dynamic selector changing SQLite database via AJAX -->
+                            <select class="form-control status-select" style="padding: 0.25rem 0.5rem; font-size: 0.75rem; width: 110px; height: 30px; border-radius: 6px; border-color: var(--border-color); font-weight: 600;" data-id="{{ item.id }}">
+                                <option value="Pending" {% if item.status == 'Pending' %}selected{% endif %}>🔴 Pending</option>
+                                <option value="Monitoring" {% if item.status == 'Monitoring' %}selected{% endif %}>🔵 Monitor</option>
+                                <option value="Treated" {% if item.status == 'Treated' %}selected{% endif %}>🟢 Treated</option>
+                            </select>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <!-- Empty placeholder card -->
+        <div style="text-align: center; padding: 3rem 1rem; opacity: 0.8;" class="treatment-panel">
+            <span style="font-size: 2.5rem; display: block; margin-bottom: 1rem;">📭</span>
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.25rem;" class="trn" data-key="empty_history">No Diagnostic Log Registered</h3>
+            <p style="font-size: 0.8rem; opacity: 0.7;" class="trn" data-key="empty_history_desc">Navigate to the Leaf Scanner page to run your first computer vision analysis.</p>
+        </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

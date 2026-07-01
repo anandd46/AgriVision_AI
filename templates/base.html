@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AI Agriculture Disease Detection{% endblock %}</title>
+    <meta name="description" content="AI Agriculture Disease Detection - Diagnose diseases in Coconut and Arecanut leaves, calculate precise fertilizer dosages, and integrate with mobile applications.">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    
+    <div class="app-container">
+        <!-- Sidebar Navigation (Desktop Only) -->
+        <aside class="sidebar glass-panel">
+            <div class="brand-section">
+                <!-- SVG Palm Tree Logo -->
+                <svg class="brand-logo" viewBox="0 0 24 24">
+                    <path d="M2,22 C8,22 12,18 12,12 C12,18 16,22 22,22 M12,12 C12,8 9,4 6,2 C8,5 10,9 12,12 M12,12 C12,9 14,5 17,2 C15,4 13,8 12,12 M12,12 C7,12 3,10 1,8 C4,10 8,11 12,12 M12,12 C16,12 20,10 23,8 C19,10 15,11 12,12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+                </svg>
+                <span class="brand-name">AgriVision AI</span>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item {% if request.path == '/' %}active{% endif %}">
+                    <a href="{{ url_for('dashboard') }}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="9"></rect>
+                            <rect x="14" y="3" width="7" height="5"></rect>
+                            <rect x="14" y="12" width="7" height="9"></rect>
+                            <rect x="3" y="16" width="7" height="5"></rect>
+                        </svg>
+                        <span class="trn" data-key="nav_dashboard">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item {% if request.path == '/scan' %}active{% endif %}">
+                    <a href="{{ url_for('scan_page') }}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                            <circle cx="12" cy="13" r="4"></circle>
+                        </svg>
+                        <span class="trn" data-key="nav_scanner">Leaf Scanner</span>
+                    </a>
+                </li>
+                <li class="nav-item {% if request.path == '/fertilizer' %}active{% endif %}">
+                    <a href="{{ url_for('fertilizer_page') }}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                        <span class="trn" data-key="nav_fertilizer">Fertilizer Guide</span>
+                    </a>
+                </li>
+                <li class="nav-item {% if request.path == '/calendar' %}active{% endif %}">
+                    <a href="{{ url_for('calendar_page') }}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        <span class="trn" data-key="nav_calendar">Farming Calendar</span>
+                    </a>
+                </li>
+                <li class="nav-item {% if request.path == '/library' %}active{% endif %}">
+                    <a href="{{ url_for('library_page') }}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                        </svg>
+                        <span class="trn" data-key="nav_library">Disease Library</span>
+                    </a>
+                </li>
+                <li class="nav-item {% if request.path == '/api-docs' %}active{% endif %}">
+                    <a href="{{ url_for('api_docs_page') }}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect>
+                            <line x1="6" y1="8" x2="18" y2="8"></line>
+                            <line x1="6" y1="12" x2="18" y2="12"></line>
+                            <line x1="6" y1="16" x2="12" y2="16"></line>
+                        </svg>
+                        <span class="trn" data-key="nav_mobile">Mobile API Docs</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="top-header">
+                <div>
+                    <span class="trn" data-key="welcome_note" style="font-size: 0.95rem; opacity: 0.7; font-weight: 500;">Welcome to AgriVision AI</span>
+                    <h1 class="trn" data-key="dashboard_title" style="font-size: 1.6rem; letter-spacing: -0.5px;">{% block header_title %}Agriculture AI Dashboard{% endblock %}</h1>
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <!-- Language Selection Dropdown -->
+                    <div class="lang-selector-container">
+                        <select id="lang-selector" class="form-control" style="padding: 0.5rem 1rem; font-size: 0.85rem; border-radius: 50px; background: var(--card-bg); height: 44px;">
+                            <option value="en">English (EN)</option>
+                            <option value="kn">ಕನ್ನಡ (KN)</option>
+                            <option value="ml">മലയാളം (ML)</option>
+                            <option value="hi">हिन्दी (HI)</option>
+                            <option value="te">తెలుగు (TE)</option>
+                            <option value="ta">தமிழ் (TA)</option>
+                        </select>
+                    </div>
+
+                    <button class="theme-toggle-btn" id="theme-toggle" aria-label="Toggle light and dark mode">
+                        <!-- Loaded dynamically via JS -->
+                    </button>
+                </div>
+            </header>
+
+            <div class="content-body">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+        
+        <!-- Mobile Bottom Navigation (Visible only on mobile screen widths) -->
+        <nav class="mobile-nav">
+            <ul class="mobile-nav-list">
+                <li class="mobile-nav-item {% if request.path == '/' %}active{% endif %}">
+                    <a href="{{ url_for('dashboard') }}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="9"></rect>
+                            <rect x="14" y="3" width="7" height="5"></rect>
+                            <rect x="14" y="12" width="7" height="9"></rect>
+                            <rect x="3" y="16" width="7" height="5"></rect>
+                        </svg>
+                        <span class="trn" data-key="nav_home_mobile">Home</span>
+                    </a>
+                </li>
+                <li class="mobile-nav-item {% if request.path == '/scan' %}active{% endif %}">
+                    <a href="{{ url_for('scan_page') }}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                            <circle cx="12" cy="13" r="4"></circle>
+                        </svg>
+                        <span class="trn" data-key="nav_scan_mobile">Scan</span>
+                    </a>
+                </li>
+                <li class="mobile-nav-item {% if request.path == '/fertilizer' %}active{% endif %}">
+                    <a href="{{ url_for('fertilizer_page') }}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                        <span class="trn" data-key="nav_fert_mobile">Fertilizer</span>
+                    </a>
+                </li>
+                <li class="mobile-nav-item {% if request.path == '/calendar' %}active{% endif %}">
+                    <a href="{{ url_for('calendar_page') }}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        <span class="trn" data-key="nav_cal_mobile">Calendar</span>
+                    </a>
+                </li>
+                <li class="mobile-nav-item {% if request.path == '/library' %}active{% endif %}">
+                    <a href="{{ url_for('library_page') }}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                        </svg>
+                        <span class="trn" data-key="nav_lib_mobile">Library</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- ---------------------------------------------------- -->
+        <!-- Floating AgriBot Chat Widget -->
+        <!-- ---------------------------------------------------- -->
+        <div class="chat-widget-container">
+            <!-- Floating Circular Trigger -->
+            <button class="chat-trigger-btn" id="chat-trigger" aria-label="Open AgriBot assistant">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+            </button>
+
+            <!-- Collapsible Glass Chat Panel -->
+            <div class="chat-window glass-panel" id="chat-window">
+                <div class="chat-header">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span class="chat-avatar">🌱</span>
+                        <div>
+                            <strong style="display: block; font-size: 0.9rem;">AgriBot</strong>
+                            <span style="font-size: 0.7rem; opacity: 0.7;" class="trn" data-key="bot_status">Online Agronomist</span>
+                        </div>
+                    </div>
+                    <button class="chat-close-btn" id="chat-close" aria-label="Close Chat">✕</button>
+                </div>
+
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message bot-msg">
+                        <span class="trn" data-key="bot_welcome">Hello! I am AgriBot. Ask me about palm crop NPK values, palm tree spacing, or leaf disease treatments.</span>
+                    </div>
+                </div>
+
+                <div class="chat-footer">
+                    <input type="text" id="chat-input" class="form-control" placeholder="Ask AgriBot..." style="border-radius: 50px; font-size: 0.85rem; padding: 0.5rem 1rem;">
+                    <button id="chat-send" class="chat-send-btn" aria-label="Send message">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
