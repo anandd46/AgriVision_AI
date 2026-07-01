@@ -62,7 +62,7 @@ Make sure you have **Python 3.8 or higher** installed on your system.
 ### 1. Open Terminal/PowerShell at the Project Location
 Open your terminal (PowerShell, Command Prompt, or Bash) and navigate to the project directory:
 ```bash
-cd E:\ANTIGRAVITY\Agri
+cd E:\Agri
 ```
 
 ### 2. Create a Virtual Environment (Recommended)
