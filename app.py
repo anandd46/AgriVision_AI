@@ -1,5 +1,8 @@
 from flask import Flask, render_template, request, jsonify, url_for, session
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 import sys
 import re
 import database
@@ -400,10 +403,6 @@ def api_scan():
     crop = request.form.get('crop', 'coconut').lower()
     lang = request.form.get('lang', 'en').lower().strip()
     
-    if crop not in FFERTILIZER_DATABASE:
-        # FERTILIZER_DATABASE is the local name, let's check
-        pass
-    # Wait, let's keep the exact check from original code: FERTILIZER_DATABASE
     if crop not in FERTILIZER_DATABASE:
         return jsonify({"error": f"Unsupported crop variety: '{crop}'"}), 400
         

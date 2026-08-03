@@ -4,6 +4,16 @@ import base64
 import os
 from PIL import Image
 import io
+import json
+from google import genai
+from google.genai import types
+from pydantic import BaseModel, Field
+
+class CropDiseasePrediction(BaseModel):
+    crop_name: str = Field(description="The name of the crop identified in the image, strictly one of: coconut, arecanut, banana, mango, papaya, tomato, brinjal, chilli, pepper, cocoa, paddy, rubber.")
+    disease_key: str = Field(description="The exact disease name identified, or 'Healthy'")
+    confidence: float = Field(description="Confidence percentage (0.0 to 100.0) of the prediction")
+    symptoms_observed: list[str] = Field(description="List of specific symptoms observed in the image")
 
 # Standardized Database of Crops, Diseases, Symptoms, Treatments, and Fertilizers (12 Crops)
 DISEASE_DATABASE = {
@@ -347,6 +357,12 @@ class DiseaseDetector:
             self.tf_available = True
         except ImportError:
             pass
+            
+        # Initialize Gemini Client
+        self.gemini_api_key = os.environ.get("GEMINI_API_KEY")
+        self.gemini_client = None
+        if self.gemini_api_key:
+            self.gemini_client = genai.Client(api_key=self.gemini_api_key)
 
     def analyze_image(self, image_bytes, crop_hint="coconut"):
         """
@@ -429,8 +445,66 @@ class DiseaseDetector:
 
         # Crop variety standard auditing
         crop_key = crop_hint.lower()
-        if crop_key not in DISEASE_DATABASE:
-            crop_key = "coconut" # safety fallback
+        gemini_success = False
+
+        if self.gemini_client:
+            try:
+                pil_img = Image.open(io.BytesIO(image_bytes))
+                crop_options = list(DISEASE_DATABASE.keys())
+                
+                # Build context mapping for Gemini to choose the right disease keys
+                db_context = {}
+                for c in crop_options:
+                    db_context[c] = list(DISEASE_DATABASE[c].keys())
+                
+                prompt = f"""
+                You are an expert agronomist AI.
+                Analyze the provided image of a plant leaf.
+                
+                1. Identify which of these crops it most likely belongs to: {', '.join(crop_options)}. 
+                   (Note: The user hinted '{crop_hint}', but they may be wrong. Determine the true crop from the image).
+                2. Determine the health status. Is it healthy or diseased? 
+                3. Choose the EXACT disease key from the provided database for the identified crop. If it doesn't fit a disease perfectly, choose 'Healthy'.
+                   Database mapping (Crop -> Available Diseases):
+                   {json.dumps(db_context, indent=2)}
+                4. Note any specific symptoms.
+                """
+                
+                response = self.gemini_client.models.generate_content(
+                    model='gemini-2.5-flash',
+                    contents=[pil_img, prompt],
+                    config=types.GenerateContentConfig(
+                        response_mime_type="application/json",
+                        response_schema=CropDiseasePrediction,
+                        temperature=0.2,
+                    ),
+                )
+                
+                prediction = response.parsed
+                
+                predicted_crop = prediction.crop_name.lower().strip()
+                predicted_disease = prediction.disease_key.strip()
+                
+                # Validate Gemini Output against DB
+                if predicted_crop in DISEASE_DATABASE:
+                    crop_key = predicted_crop
+                    
+                    if predicted_disease in DISEASE_DATABASE[crop_key]:
+                        disease_key = predicted_disease
+                    else:
+                        disease_key = "Healthy"
+                        
+                    confidence = prediction.confidence
+                    detected_symptoms = prediction.symptoms_observed
+                    gemini_success = True
+                    print(f"Gemini Prediction Success: Crop={crop_key}, Disease={disease_key}, Confidence={confidence}")
+            except Exception as e:
+                print(f"Gemini API Error: {e}")
+                
+        # Fallback to OpenCV logic if Gemini fails or is not configured
+        if not gemini_success:
+            if crop_key not in DISEASE_DATABASE:
+                crop_key = "coconut" # safety fallback
 
         # Diagnostic Rules routing for 12 crops
         if crop_key == "tomato":
