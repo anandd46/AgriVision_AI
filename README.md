@@ -62,7 +62,7 @@ Make sure you have **Python 3.8 or higher** installed on your system.
 ### 1. Open Terminal/PowerShell at the Project Location
 Open your terminal (PowerShell, Command Prompt, or Bash) and navigate to the project directory:
 ```bash
-cd E:\ANTIGRAVITY\Agri
+cd E:\Agri
 ```
 
 ### 2. Create a Virtual Environment (Recommended)
@@ -99,34 +99,7 @@ http://127.0.0.1:5000
 
 ---
 
-## 📦 Uploading the Project to GitHub
 
-Follow these steps to upload this project to your own GitHub repository:
-
-1. **Log in to GitHub** and click the **New Repository** button.
-2. Name your repository (e.g., `ai-agriculture-disease-detection`) and click **Create Repository**. Do NOT initialize with a README, gitignore, or license (these are already provided or handled).
-3. Open your terminal in the project folder and run:
-   ```bash
-   # Initialize local Git repository
-   git init
-
-   # Stage all files
-   git add .
-
-   # Commit the files
-   git commit -m "feat: initial commit for AgriVision AI"
-
-   # Rename branch to main
-   git branch -M main
-
-   # Link your local repo to GitHub (Replace with your actual GitHub URL)
-   git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPOSITORY_NAME.git
-
-   # Push to GitHub
-   git push -u origin main
-   ```
-
----
 
 ## 🛠️ Scaling Up to Deep Learning (TensorFlow / YOLO)
 
