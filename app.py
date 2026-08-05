@@ -16,7 +16,10 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 app = Flask(__name__)
 # Initialize chatbot
 bot = AgriBot()
-app.config['SECRET_KEY'] = 'agricultural-ai-secret-key-12345'
+app.config['SECRET_KEY'] = os.getenv(
+    "SECRET_KEY",
+    "agricultural-ai-secret-key-12345"
+)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload
 
 # Initialize database tables on startup
@@ -726,5 +729,5 @@ def api_chat():
         reply = bot.respond(user_msg, lang=lang)
     return jsonify({"reply": reply})
 
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=5000)
